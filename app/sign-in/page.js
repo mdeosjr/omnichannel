@@ -17,10 +17,10 @@ export default function SignIn() {
 
     try {
       const { data } = await api.login({ ...userData });
-      localStorage.setItem("auth", JSON.stringify(data.token))
+      localStorage.setItem("auth", data.token);
       router.push('/me');
     } catch (e) {
-      alert(e.response.data)
+      alert(e.response.data);
     }
   }
 
