@@ -25,18 +25,12 @@ async function getUser(token) {
 
 async function updateUser(data, token) {
   const config = createConfig(token)
-  return axios.put(`${BASE_URL}/users`, data, config)
-}
-
-async function updateAddress(data, token) {
-  const config = createConfig(token)
-  return axios.put(`${BASE_URL}/login`, data, config)
+  return axios.patch(`${BASE_URL}/users`, data, config)
 }
 
 export const api = {
   createUser,
   login,
   getUser,
-  updateUser,
-  updateAddress
+  updateUser
 }

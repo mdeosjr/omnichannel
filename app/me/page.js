@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { api, useViaCep } from "../services";
-import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Profile() {
   const [user, setUser] = useState({});
+  const [render, setRender] = useState(false);
+  const [token, setToken] = useState();
   const [userData, setUserData] = useState({
     name: "",
     age: "",
@@ -25,6 +28,7 @@ export default function Profile() {
   useEffect(() => {
     async function getUser() {
       const token = localStorage.getItem("auth");
+      setToken(token);
       const { data } = await api.getUser(token)
 
       const { address, ...user } = data;
@@ -34,16 +38,24 @@ export default function Profile() {
     }
 
     getUser()
-  }, [])
+  }, [render])
 
-  const router = useRouter();
-
-  async function register(e) {
+  async function update(e) {
     e.preventDefault();
 
     try {
-      await api.createUser({ ...userData, address: addressData });
-      router.push('/sign-in');
+      await api.updateUser({ ...userData, address: addressData }, token);
+      setRender(!render);
+      toast.success('User updated!', {
+        position: 'top-right',
+        autoClose: 1800,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+        theme: 'light'
+      })
     } catch (e) {
       alert(e.response.data)
     }
@@ -92,7 +104,7 @@ export default function Profile() {
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
       <div className="w-full p-6 bg-white rounded-md shadow-md lg:max-w-xl">
         <h1 className="text-3xl font-bold text-center text-gray-700">Welcome, {user?.name}!</h1>
-        <form className="mt-6" onSubmit={register}>
+        <form className="mt-6" onSubmit={update}>
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -142,6 +154,7 @@ export default function Profile() {
               name="email"
               value={userData.email}
               onChange={handleInput}
+              disabled
             />
           </div>
           <div className="mb-4">
@@ -250,6 +263,7 @@ export default function Profile() {
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 }
